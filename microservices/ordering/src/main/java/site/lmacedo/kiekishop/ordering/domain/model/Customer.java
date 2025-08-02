@@ -59,7 +59,6 @@ public class Customer {
         this.setLoyaltyPoints(loyaltyPoints);
     }
 
-
     public void archive() {
         verifyIfChangeable();
         this.setArchived(true);
@@ -72,9 +71,12 @@ public class Customer {
         this.setPromotionNotificationsAllowed(false);
     }
 
-    public void addLoyaltyPoints(Integer points) {
+    public void addLoyaltyPoints(Integer loyaltyPointsAdded) {
         verifyIfChangeable();
-        this.loyaltyPoints += points;
+        if(loyaltyPointsAdded <= 0) {
+            throw new IllegalArgumentException(VALIDATION_ERROR_LOYALTYPOINTS_IS_NEGATIVE);
+        }
+        this.setLoyaltyPoints(this.loyaltyPoints() + loyaltyPointsAdded);
     }
 
     public void enablePromotionNotifications() {
@@ -207,6 +209,9 @@ public class Customer {
 
     private void setLoyaltyPoints(Integer loyaltyPoints) {
         Objects.requireNonNull(loyaltyPoints);
+        if (loyaltyPoints < 0) {
+            throw new IllegalArgumentException(VALIDATION_ERROR_LOYALTYPOINTS_IS_NEGATIVE);
+        }
         this.loyaltyPoints = loyaltyPoints;
     }
 

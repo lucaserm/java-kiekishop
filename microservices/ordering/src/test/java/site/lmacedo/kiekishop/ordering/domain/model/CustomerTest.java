@@ -108,4 +108,26 @@ class CustomerTest {
                 .isThrownBy(() -> customer.addLoyaltyPoints(10));
 
     }
+
+    @Test
+    void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_shouldGenerateException() {
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1991, 7, 5),
+                "john.doe@gmail.com",
+                "478-256-2504",
+                "25-08-0578",
+                true,
+                OffsetDateTime.now()
+        );
+
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> customer.addLoyaltyPoints(-10));
+
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> customer.addLoyaltyPoints(0));
+    }
+
+
 }
