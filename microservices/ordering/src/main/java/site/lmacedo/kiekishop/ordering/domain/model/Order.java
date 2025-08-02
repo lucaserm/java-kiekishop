@@ -1,12 +1,10 @@
 package site.lmacedo.kiekishop.ordering.domain.model;
 
 import lombok.Builder;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.BillingInfo;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.Money;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.Quantity;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.ShippingInfo;
+import site.lmacedo.kiekishop.ordering.domain.valueobject.*;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.id.CustomerId;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.id.OrderId;
+import site.lmacedo.kiekishop.ordering.domain.valueobject.id.ProductId;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -79,6 +77,23 @@ public class Order {
                 null,
                 new HashSet<>()
         );
+    }
+
+    public void addItem(ProductId productId, ProductName productName,
+                        Money price, Quantity quantity) {
+        OrderItem ordemItem = OrderItem.brandNew()
+                .orderId(this.id)
+                .price(price)
+                .quantity(quantity)
+                .productId(productId)
+                .productName(productName)
+                .build();
+
+        if(this.items == null) {
+            this.items = new HashSet<>();
+        }
+
+        this.items.add(ordemItem);
     }
 
     public OrderId id() {
