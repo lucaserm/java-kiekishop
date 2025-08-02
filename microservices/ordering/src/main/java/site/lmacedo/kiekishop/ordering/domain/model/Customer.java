@@ -3,6 +3,7 @@ package site.lmacedo.kiekishop.ordering.domain.model;
 import lombok.Builder;
 import site.lmacedo.kiekishop.ordering.domain.exception.CustomerArchivedException;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.*;
+import site.lmacedo.kiekishop.ordering.domain.valueobject.id.CustomerId;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -35,24 +36,6 @@ public class Customer {
                 promotionNotificationsAllowed, false,
                 OffsetDateTime.now(), null, LoyaltyPoints.ZERO, address
         );
-    }
-
-    @SuppressWarnings("squid:S107")
-    private Customer(
-            CustomerId id, FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
-            Boolean promotionNotificationsAllowed, OffsetDateTime registeredAt, Address address
-    ) {
-        this.setId(id);
-        this.setFullName(fullName);
-        this.setBirthDate(birthDate);
-        this.setEmail(email);
-        this.setPhone(phone);
-        this.setDocument(document);
-        this.setPromotionNotificationsAllowed(promotionNotificationsAllowed);
-        this.setRegisteredAt(registeredAt);
-        this.setArchived(false);
-        this.setLoyaltyPoints(LoyaltyPoints.ZERO);
-        this.setAddress(address);
     }
 
     @SuppressWarnings("squid:S107")

@@ -1,6 +1,7 @@
 package site.lmacedo.kiekishop.ordering.domain.model;
 
 import site.lmacedo.kiekishop.ordering.domain.valueobject.*;
+import site.lmacedo.kiekishop.ordering.domain.valueobject.id.CustomerId;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
