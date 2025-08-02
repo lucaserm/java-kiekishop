@@ -1,35 +1,46 @@
 package site.lmacedo.kiekishop.ordering.domain.model;
 
+import lombok.Builder;
 import site.lmacedo.kiekishop.ordering.domain.exception.CustomerArchivedException;
-import site.lmacedo.kiekishop.ordering.domain.validator.FieldValidations;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.CustomerId;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.FullName;
-import site.lmacedo.kiekishop.ordering.domain.valueobject.LoyaltyPoints;
+import site.lmacedo.kiekishop.ordering.domain.valueobject.*;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import static site.lmacedo.kiekishop.ordering.domain.exception.ErrorMessages.*;
+import static site.lmacedo.kiekishop.ordering.domain.exception.ErrorMessages.VALIDATION_ERROR_FULLNAME_IS_NULL;
 
 public class Customer {
     private CustomerId id;
     private FullName fullName;
-    private LocalDate birthDate;
-    private String email;
-    private String phone;
-    private String document;
+    private BirthDate birthDate;
+    private Email email;
+    private Phone phone;
+    private Document document;
     private Boolean promotionNotificationsAllowed;
     private Boolean archived;
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
     private LoyaltyPoints loyaltyPoints;
+    private Address address;
+
+    @Builder(builderClassName = "BrandNewCustomerBuild", builderMethodName = "brandNew")
+    private static Customer createBrandNew(
+            FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
+            Boolean promotionNotificationsAllowed, Address address
+    ) {
+        return new Customer(
+                new CustomerId(), fullName, birthDate,
+                email, phone, document,
+                promotionNotificationsAllowed, false,
+                OffsetDateTime.now(), null, LoyaltyPoints.ZERO, address
+        );
+    }
 
     @SuppressWarnings("squid:S107")
-    public Customer(
-            CustomerId id, FullName fullName, LocalDate birthDate, String email, String phone, String document,
-            Boolean promotionNotificationsAllowed, OffsetDateTime registeredAt
+    private Customer(
+            CustomerId id, FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
+            Boolean promotionNotificationsAllowed, OffsetDateTime registeredAt, Address address
     ) {
         this.setId(id);
         this.setFullName(fullName);
@@ -41,13 +52,15 @@ public class Customer {
         this.setRegisteredAt(registeredAt);
         this.setArchived(false);
         this.setLoyaltyPoints(LoyaltyPoints.ZERO);
+        this.setAddress(address);
     }
 
     @SuppressWarnings("squid:S107")
-    public Customer(
-            CustomerId id, FullName fullName, LocalDate birthDate, String email, String phone, String document,
+    @Builder(builderClassName = "ExistingCustomerBuild", builderMethodName = "existing")
+    private Customer(
+            CustomerId id, FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
             Boolean promotionNotificationsAllowed, Boolean archived, OffsetDateTime registeredAt,
-            OffsetDateTime archivedAt, LoyaltyPoints loyaltyPoints
+            OffsetDateTime archivedAt, LoyaltyPoints loyaltyPoints, Address address
     ) {
         this.setId(id);
         this.setFullName(fullName);
@@ -60,6 +73,7 @@ public class Customer {
         this.setArchived(archived);
         this.setArchivedAt(archivedAt);
         this.setLoyaltyPoints(loyaltyPoints);
+        this.setAddress(address);
     }
 
     public void archive() {
@@ -67,11 +81,12 @@ public class Customer {
         this.setArchived(true);
         this.setArchivedAt(OffsetDateTime.now());
         this.setFullName(new FullName("Anonymous", "Anonymous"));
-        this.setEmail(UUID.randomUUID() + "@anonymous.com");
-        this.setPhone("000-000-0000");
-        this.setDocument("000-00-000");
+        this.setEmail(new Email(UUID.randomUUID() + "@anonymous.com"));
+        this.setPhone(new Phone("000-000-0000"));
+        this.setDocument(new Document("000-00-000"));
         this.setBirthDate(null);
         this.setPromotionNotificationsAllowed(false);
+        this.setAddress(this.address.toBuilder().number("Anonymized").complement(null).build());
     }
 
     public void addLoyaltyPoints(LoyaltyPoints loyaltyPointsAdded) {
@@ -94,14 +109,19 @@ public class Customer {
         this.setFullName(fullName);
     }
 
-    public void changeEmail(String email) {
+    public void changeEmail(Email email) {
         verifyIfChangeable();
         this.setEmail(email);
     }
 
-    public void changePhone(String phone) {
+    public void changePhone(Phone phone) {
         verifyIfChangeable();
         this.setPhone(phone);
+    }
+
+    public void changeAddress(Address address) {
+        verifyIfChangeable();
+        this.setAddress(address);
     }
 
     public CustomerId id() {
@@ -112,19 +132,19 @@ public class Customer {
         return fullName;
     }
 
-    public LocalDate birthDate() {
+    public BirthDate birthDate() {
         return birthDate;
     }
 
-    public String email() {
+    public Email email() {
         return email;
     }
 
-    public String phone() {
+    public Phone phone() {
         return phone;
     }
 
-    public String document() {
+    public Document document() {
         return document;
     }
 
@@ -148,6 +168,10 @@ public class Customer {
         return loyaltyPoints;
     }
 
+    public Address address() {
+        return address;
+    }
+
     private void setId(CustomerId id) {
         Objects.requireNonNull(id);
         this.id = id;
@@ -158,30 +182,23 @@ public class Customer {
         this.fullName = fullName;
     }
 
-    private void setBirthDate(LocalDate birthDate) {
+    private void setBirthDate(BirthDate birthDate) {
         if (birthDate == null) {
-            this.birthDate = birthDate;
+            this.birthDate = null;
             return;
-        }
-
-        if(birthDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException(VALIDATION_ERROR_BIRTHDATE_MUST_IN_PAST);
         }
         this.birthDate = birthDate;
     }
 
-    private void setEmail(String email) {
-        FieldValidations.requiresValidEmail(email, VALIDATION_ERROR_EMAIL_IS_INVALID);
+    private void setEmail(Email email) {
         this.email = email;
     }
 
-    private void setPhone(String phone) {
-        Objects.requireNonNull(phone);
+    private void setPhone(Phone phone) {
         this.phone = phone;
     }
 
-    private void setDocument(String document) {
-        Objects.requireNonNull(document);
+    private void setDocument(Document document) {
         this.document = document;
     }
 
@@ -209,8 +226,13 @@ public class Customer {
         this.loyaltyPoints = loyaltyPoints;
     }
 
+    private void setAddress(Address address) {
+        Objects.requireNonNull(address);
+        this.address = address;
+    }
+
     private void verifyIfChangeable() {
-        if(Boolean.TRUE.equals(this.isArchived())) {
+        if (Boolean.TRUE.equals(this.isArchived())) {
             throw new CustomerArchivedException();
         }
     }
