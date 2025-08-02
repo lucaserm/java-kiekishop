@@ -1,13 +1,16 @@
 package site.lmacedo.kiekishop.ordering.domain.model;
 
 import lombok.Builder;
+import site.lmacedo.kiekishop.ordering.domain.exception.OrderStatusCanNotBeChanged;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.*;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.id.CustomerId;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.id.OrderId;
 import site.lmacedo.kiekishop.ordering.domain.valueobject.id.ProductId;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -94,6 +97,7 @@ public class Order {
         }
 
         this.items.add(ordemItem);
+        this.recalculateTotals();
     }
 
     public OrderId id() {
@@ -153,7 +157,61 @@ public class Order {
     }
 
     public Set<OrderItem> items() {
-        return items;
+        return Collections.unmodifiableSet(items);
+    }
+
+
+    private void recalculateTotals() {
+        BigDecimal totalItemsAmount = this.items.stream().map(i -> i.totalAmount().value())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Integer totalItemsQuantity = this.items.stream().map(i -> i.quantity().value())
+                .reduce(0, Integer::sum);
+
+        BigDecimal shippingCost;
+
+        if (this.shippingCost() == null) {
+            shippingCost = BigDecimal.ZERO;
+        } else {
+            shippingCost = this.shippingCost.value();
+        }
+
+        BigDecimal totalAmount = totalItemsAmount.add(shippingCost);
+
+        this.setTotalAmount(new Money(totalAmount));
+        this.setTotalItems(new Quantity(totalItemsQuantity));
+    }
+
+    public void place() {
+        this.changeStatus(OrderStatus.PLACED);
+    }
+
+    private void changeStatus(OrderStatus newStatus) {
+        Objects.requireNonNull(newStatus);
+        if (this.status().canNotChangeTo(newStatus)){
+            throw new OrderStatusCanNotBeChanged(this.id(), this.status(), newStatus);
+        }
+        this.setStatus(newStatus);
+    }
+
+    public boolean isDraft() {
+        return OrderStatus.DRAFT.equals(this.status());
+    }
+
+    public boolean isPlaced() {
+        return OrderStatus.PLACED.equals(this.status());
+    }
+
+    public boolean isPaid() {
+        return OrderStatus.PAID.equals(this.status());
+    }
+
+    public boolean isReady() {
+        return OrderStatus.READY.equals(this.status());
+    }
+
+    public boolean isCanceled() {
+        return OrderStatus.CANCELED.equals(this.status());
     }
 
     private void setId(OrderId id) {
