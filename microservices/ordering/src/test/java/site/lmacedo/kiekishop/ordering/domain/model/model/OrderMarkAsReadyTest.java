@@ -1,0 +1,59 @@
+package site.lmacedo.kiekishop.ordering.domain.model.model;
+
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import site.lmacedo.kiekishop.ordering.domain.model.exception.OrderStatusCanNotBeChangedException;
+
+class OrderMarkAsReadyTest {
+
+    @Test
+    void givenPaidOrder_whenMarkAsReady_shouldUpdateStatusAndTimestamp() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PAID).build();
+
+        order.markAsReady();
+
+        Assertions.assertWith(order,
+                o -> Assertions.assertThat(o.status()).isEqualTo(OrderStatus.READY),
+                o -> Assertions.assertThat(o.readyAt()).isNotNull()
+        );
+    }
+
+    @Test
+    void givenDraftOrder_whenMarkAsReady_shouldThrowExceptionAndNotChangeState() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.DRAFT).build();
+
+        Assertions.assertThatExceptionOfType(OrderStatusCanNotBeChangedException.class)
+                .isThrownBy(order::markAsReady);
+
+        Assertions.assertWith(order,
+                o -> Assertions.assertThat(o.status()).isEqualTo(OrderStatus.DRAFT),
+                o -> Assertions.assertThat(o.readyAt()).isNull()
+        );
+    }
+
+    @Test
+    void givenPlacedOrder_whenMarkAsReady_shouldThrowExceptionAndNotChangeState() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+
+        Assertions.assertThatExceptionOfType(OrderStatusCanNotBeChangedException.class)
+                .isThrownBy(order::markAsReady);
+
+        Assertions.assertWith(order,
+                o -> Assertions.assertThat(o.status()).isEqualTo(OrderStatus.PLACED),
+                o -> Assertions.assertThat(o.readyAt()).isNull()
+        );
+    }
+
+    @Test
+    void givenReadyOrder_whenMarkAsReady_shouldThrowExceptionAndNotChangeState() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.READY).build();
+
+        Assertions.assertThatExceptionOfType(OrderStatusCanNotBeChangedException.class)
+                .isThrownBy(order::markAsReady);
+
+        Assertions.assertWith(order,
+                o -> Assertions.assertThat(o.status()).isEqualTo(OrderStatus.READY),
+                o -> Assertions.assertThat(o.readyAt()).isNotNull()
+        );
+    }
+}
