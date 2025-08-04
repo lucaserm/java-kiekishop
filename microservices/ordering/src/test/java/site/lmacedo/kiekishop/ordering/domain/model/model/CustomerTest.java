@@ -18,11 +18,8 @@ class CustomerTest {
 
     @Test
     void given_invalidEmail_whenTryUpdateCustomerEmail_shouldGenerateException() {
-        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
-
-        Email invalid = new Email("invalid");
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> customer.changeEmail(invalid));
+                .isThrownBy(() -> new Email("invalid"));
     }
 
     @Test
@@ -94,13 +91,11 @@ class CustomerTest {
     @Test
     void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_shouldGenerateException() {
         Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
-        LoyaltyPoints loyaltyPointsAdded = new LoyaltyPoints(-10);
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> customer.addLoyaltyPoints(loyaltyPointsAdded));
+                .isThrownBy(() -> new LoyaltyPoints(-10));
 
-        LoyaltyPoints loyaltyPointsAdded1 = new LoyaltyPoints(0);
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> customer.addLoyaltyPoints(loyaltyPointsAdded1));
+                .isThrownBy(() -> customer.addLoyaltyPoints(LoyaltyPoints.ZERO));
     }
 
 

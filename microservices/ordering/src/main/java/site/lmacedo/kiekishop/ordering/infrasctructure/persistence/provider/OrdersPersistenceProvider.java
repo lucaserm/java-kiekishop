@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import site.lmacedo.kiekishop.ordering.domain.model.model.Order;
 import site.lmacedo.kiekishop.ordering.domain.model.repository.Orders;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrdersPersistenceProvider implements Orders {
 
     private final OrderPersistenceEntityRepository repository;
@@ -38,6 +40,7 @@ public class OrdersPersistenceProvider implements Orders {
     }
 
     @Override
+    @Transactional
     public void add(Order aggregateRoot) {
         long orderId = aggregateRoot.id().value().toLong();
         repository.findById(orderId).ifPresentOrElse(
@@ -69,7 +72,7 @@ public class OrdersPersistenceProvider implements Orders {
     }
 
     @Override
-    public int count() {
-        return (int) repository.count();
+    public long count() {
+        return repository.count();
     }
 }

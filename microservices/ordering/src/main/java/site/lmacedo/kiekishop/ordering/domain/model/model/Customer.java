@@ -1,6 +1,8 @@
 package site.lmacedo.kiekishop.ordering.domain.model.model;
 
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Setter;
 import site.lmacedo.kiekishop.ordering.domain.model.exception.CustomerArchivedException;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.*;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.CustomerId;
@@ -25,13 +27,16 @@ public class Customer implements AggregateRoot<CustomerId> {
     private LoyaltyPoints loyaltyPoints;
     private Address address;
 
+    @Setter(AccessLevel.PRIVATE)
+    private Long version;
+
     @Builder(builderClassName = "BrandNewCustomerBuild", builderMethodName = "brandNew")
     private static Customer createBrandNew(
             FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
             Boolean promotionNotificationsAllowed, Address address
     ) {
         return new Customer(
-                new CustomerId(), fullName, birthDate,
+                new CustomerId(), null, fullName, birthDate,
                 email, phone, document,
                 promotionNotificationsAllowed, false,
                 OffsetDateTime.now(), null, LoyaltyPoints.ZERO, address
@@ -41,11 +46,12 @@ public class Customer implements AggregateRoot<CustomerId> {
     @SuppressWarnings("squid:S107")
     @Builder(builderClassName = "ExistingCustomerBuild", builderMethodName = "existing")
     private Customer(
-            CustomerId id, FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
+            CustomerId id, Long version, FullName fullName, BirthDate birthDate, Email email, Phone phone, Document document,
             Boolean promotionNotificationsAllowed, Boolean archived, OffsetDateTime registeredAt,
             OffsetDateTime archivedAt, LoyaltyPoints loyaltyPoints, Address address
     ) {
         this.setId(id);
+        this.setVersion(version);
         this.setFullName(fullName);
         this.setBirthDate(birthDate);
         this.setEmail(email);
@@ -153,6 +159,10 @@ public class Customer implements AggregateRoot<CustomerId> {
 
     public Address address() {
         return address;
+    }
+
+    public Long version() {
+        return version;
     }
 
     private void setId(CustomerId id) {

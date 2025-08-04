@@ -1,16 +1,21 @@
 package site.lmacedo.kiekishop.ordering.domain.model.repository;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import site.lmacedo.kiekishop.ordering.domain.model.model.CustomerTestDataBuilder;
 import site.lmacedo.kiekishop.ordering.domain.model.model.Order;
 import site.lmacedo.kiekishop.ordering.domain.model.model.OrderStatus;
 import site.lmacedo.kiekishop.ordering.domain.model.model.OrderTestDataBuilder;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.OrderId;
+import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.CustomerPersistenceEntityAssembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.OrderPersistenceEntityAssembler;
+import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.CustomerPersistenceEntityDisassembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.OrderPersistenceEntityDisassembler;
+import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.provider.CustomersPersistenceProvider;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.provider.OrdersPersistenceProvider;
 
 import java.util.Optional;
@@ -19,15 +24,27 @@ import java.util.Optional;
 @Import({
         OrdersPersistenceProvider.class,
         OrderPersistenceEntityAssembler.class,
-        OrderPersistenceEntityDisassembler.class
+        OrderPersistenceEntityDisassembler.class,
+        CustomersPersistenceProvider.class,
+        CustomerPersistenceEntityAssembler.class,
+        CustomerPersistenceEntityDisassembler.class
 })
 class OrdersIT {
 
     private Orders orders;
+    private Customers customers;
 
     @Autowired
-    public OrdersIT(Orders orders) {
+    public OrdersIT(Orders orders, Customers customers) {
         this.orders = orders;
+        this.customers = customers;
+    }
+
+    @BeforeEach
+    void setup() {
+        if(!customers.exists(CustomerTestDataBuilder.DEFAULT_CUSTOMER_ID)) {
+            customers.add(CustomerTestDataBuilder.existingCustomer().build());
+        }
     }
 
     @Test
@@ -72,4 +89,23 @@ class OrdersIT {
 
         Assertions.assertThat(order.isPaid()).isTrue();
     }
+
+    @Test
+    void shouldCountExistingOrders() {
+        Assertions.assertThat(orders.count()).isZero();
+        Order order1 = OrderTestDataBuilder.anOrder().build();
+        Order order2 = OrderTestDataBuilder.anOrder().build();
+        orders.add(order1);
+        orders.add(order2);
+        Assertions.assertThat(orders.count()).isEqualTo(2L);
+    }
+
+    @Test
+    void shouldReturnIfOrderExists() {
+        Order order = OrderTestDataBuilder.anOrder().build();
+        orders.add(order);
+        Assertions.assertThat(orders.exists(order.id())).isTrue();
+        Assertions.assertThat(orders.exists(new OrderId())).isFalse();
+    }
+
 }

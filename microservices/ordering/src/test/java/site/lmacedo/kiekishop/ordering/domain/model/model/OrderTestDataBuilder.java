@@ -5,8 +5,10 @@ import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.CustomerId;
 
 import java.time.LocalDate;
 
+import static site.lmacedo.kiekishop.ordering.domain.model.model.CustomerTestDataBuilder.DEFAULT_CUSTOMER_ID;
+
 public class OrderTestDataBuilder {
-    private CustomerId customerId = new CustomerId();
+    private CustomerId customerId = DEFAULT_CUSTOMER_ID;
 
     private PaymentMethod paymentMethod = PaymentMethod.GATEWAY_BALANCE;
 

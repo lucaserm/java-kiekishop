@@ -1,17 +1,23 @@
 package site.lmacedo.kiekishop.ordering.infrasctructure.persistence.provider;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import site.lmacedo.kiekishop.ordering.domain.model.model.CustomerTestDataBuilder;
 import site.lmacedo.kiekishop.ordering.domain.model.model.Order;
 import site.lmacedo.kiekishop.ordering.domain.model.model.OrderStatus;
 import site.lmacedo.kiekishop.ordering.domain.model.model.OrderTestDataBuilder;
 import site.lmacedo.kiekishop.ordering.domain.model.repository.Orders;
+import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.CustomerPersistenceEntityAssembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.OrderPersistenceEntityAssembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.config.SpringDataAuditingConfig;
+import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.CustomerPersistenceEntityDisassembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.OrderPersistenceEntityDisassembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.repository.OrderPersistenceEntityRepository;
 
@@ -20,18 +26,30 @@ import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.repository.Or
         OrdersPersistenceProvider.class,
         OrderPersistenceEntityAssembler.class,
         OrderPersistenceEntityDisassembler.class,
+        CustomersPersistenceProvider.class,
+        CustomerPersistenceEntityAssembler.class,
+        CustomerPersistenceEntityDisassembler.class,
         SpringDataAuditingConfig.class
 })
 class OrdersPersistenceProviderIT {
     private OrdersPersistenceProvider provider;
+    private CustomersPersistenceProvider customersProvider;
     private OrderPersistenceEntityRepository repository;
-    @Autowired
     private Orders orders;
 
     @Autowired
-    public OrdersPersistenceProviderIT(OrdersPersistenceProvider provider, OrderPersistenceEntityRepository repository) {
+    public OrdersPersistenceProviderIT(OrdersPersistenceProvider provider, CustomersPersistenceProvider customersProvider, OrderPersistenceEntityRepository repository, Orders orders) {
         this.provider = provider;
+        this.customersProvider = customersProvider;
         this.repository = repository;
+        this.orders = orders;
+    }
+
+    @BeforeEach
+    void setup() {
+        if(!customersProvider.exists(CustomerTestDataBuilder.DEFAULT_CUSTOMER_ID)) {
+            customersProvider.add(CustomerTestDataBuilder.existingCustomer().build());
+        }
     }
 
     @Test
@@ -82,5 +100,14 @@ class OrdersPersistenceProviderIT {
 
         Assertions.assertThat(savedOrder.canceledAt()).isNull();
         Assertions.assertThat(savedOrder.paidAt()).isNotNull();
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void shouldAddFindAndNotFailWhenNoTransactional() {
+        Order order = OrderTestDataBuilder.anOrder().build();
+        provider.add(order);
+
+        Assertions.assertThatNoException().isThrownBy(() -> provider.ofId(order.id()).orElseThrow());
     }
 }
