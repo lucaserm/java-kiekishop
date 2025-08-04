@@ -78,7 +78,7 @@ class ShoppingCartUpdateProviderIT {
         persistenceProvider.add(shoppingCart);
 
         ProductId productIdToUpdate = product1.id();
-        Money newProduct1Price = new Money("1500");
+        Money newProduct1Price = new Money("1000");
         Money expectedNewItemTotalPrice = newProduct1Price.multiply(new Quantity(2));
         Money expectedNewCartTotalAmount = expectedNewItemTotalPrice.add(new Money("200"));
 

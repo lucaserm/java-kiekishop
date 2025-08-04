@@ -26,7 +26,7 @@ public class ProductTestDataBuilder {
 
     public static Product.ProductBuilder aProductAltRamMemory() {
         return Product.builder()
-                .id(DEFAULT_PRODUCT_ID)
+                .id(new ProductId())
                 .name(new ProductName("8GB RAM"))
                 .price(new Money("200"))
                 .inStock(true);
@@ -34,7 +34,7 @@ public class ProductTestDataBuilder {
 
     public static Product.ProductBuilder aProductAltMouse() {
         return Product.builder()
-                .id(DEFAULT_PRODUCT_ID)
+                .id(new ProductId())
                 .name(new ProductName("Mouse"))
                 .price(new Money("100"))
                 .inStock(true);

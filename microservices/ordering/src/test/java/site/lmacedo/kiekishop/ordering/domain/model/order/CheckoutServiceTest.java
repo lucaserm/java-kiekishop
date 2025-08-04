@@ -104,11 +104,11 @@ class CheckoutServiceTest {
 
         assertThat(shoppingCart.isEmpty()).isFalse();
 
-        Money expectedTotalAmount = productAlt.price()
+        Money expectedTotalAmount = productInStock.price()
                 .multiply(new Quantity(2)).add(productAlt.price());
 
         assertThat(shoppingCart.totalAmount()).isEqualTo(expectedTotalAmount);
         assertThat(shoppingCart.totalItems()).isEqualTo(new Quantity(3));
-        assertThat(shoppingCart.items()).hasSize(1);
+        assertThat(shoppingCart.items()).hasSize(2);
     }
 }
