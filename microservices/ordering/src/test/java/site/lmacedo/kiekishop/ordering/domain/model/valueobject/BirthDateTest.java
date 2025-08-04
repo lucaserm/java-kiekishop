@@ -2,6 +2,7 @@ package site.lmacedo.kiekishop.ordering.domain.model.valueobject;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import site.lmacedo.kiekishop.ordering.domain.model.customer.BirthDate;
 
 import java.time.LocalDate;
 
