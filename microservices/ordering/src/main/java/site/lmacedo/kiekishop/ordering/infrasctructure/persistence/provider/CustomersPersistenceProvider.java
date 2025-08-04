@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import site.lmacedo.kiekishop.ordering.domain.model.model.Customer;
 import site.lmacedo.kiekishop.ordering.domain.model.repository.Customers;
+import site.lmacedo.kiekishop.ordering.domain.model.valueobject.Email;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.CustomerId;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.CustomerPersistenceEntityAssembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.CustomerPersistenceEntityDisassembler;
@@ -75,5 +76,15 @@ public class CustomersPersistenceProvider implements Customers {
     @Override
     public long count() {
         return repository.count();
+    }
+
+    @Override
+    public Optional<Customer> ofEmail(Email email) {
+        return repository.findByEmail(email.value()).map(disassembler::toDomain);
+    }
+
+    @Override
+    public boolean isEmailUnique(Email email, CustomerId exceptCustomerId) {
+        return !repository.existsByEmailAndIdNot(email.value(), exceptCustomerId.value());
     }
 }

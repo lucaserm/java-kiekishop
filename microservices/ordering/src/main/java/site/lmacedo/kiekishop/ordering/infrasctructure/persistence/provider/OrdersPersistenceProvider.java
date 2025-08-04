@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import site.lmacedo.kiekishop.ordering.domain.model.model.Order;
 import site.lmacedo.kiekishop.ordering.domain.model.repository.Orders;
+import site.lmacedo.kiekishop.ordering.domain.model.valueobject.Money;
+import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.CustomerId;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.OrderId;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.OrderPersistenceEntityAssembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.OrderPersistenceEntityDisassembler;
@@ -15,6 +17,8 @@ import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.entity.OrderP
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.repository.OrderPersistenceEntityRepository;
 
 import java.lang.reflect.Field;
+import java.time.Year;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -40,6 +44,11 @@ public class OrdersPersistenceProvider implements Orders {
     }
 
     @Override
+    public long count() {
+        return repository.count();
+    }
+
+    @Override
     @Transactional
     public void add(Order aggregateRoot) {
         long orderId = aggregateRoot.id().value().toLong();
@@ -47,6 +56,22 @@ public class OrdersPersistenceProvider implements Orders {
                 existingEntity -> update(aggregateRoot, existingEntity),
                 () -> insert(aggregateRoot)
         );
+    }
+
+    @Override
+    public List<Order> placedByCustomerInYear(CustomerId customerId, Year year) {
+        List<OrderPersistenceEntity> entities = repository.placedByCustomerInYear(customerId.value(), year.getValue());
+        return entities.stream().map(disassembler::toDomain).toList();
+    }
+
+    @Override
+    public long salesQuantityByCustomerInYear(CustomerId customerId, Year year) {
+        return repository.salesQuantityByCustomerInYear(customerId.value(), year.getValue());
+    }
+
+    @Override
+    public Money totalSoldForCustomer(CustomerId customerId) {
+        return new Money(repository.totalSoldForCustomer(customerId.value()));
     }
 
     private void update(Order aggregateRoot, OrderPersistenceEntity persistenceEntity) {
@@ -69,10 +94,5 @@ public class OrdersPersistenceProvider implements Orders {
         version.setAccessible(true);
         ReflectionUtils.setField(version, aggregateRoot, existingEntity.getVersion());
         version.setAccessible(false);
-    }
-
-    @Override
-    public long count() {
-        return repository.count();
     }
 }

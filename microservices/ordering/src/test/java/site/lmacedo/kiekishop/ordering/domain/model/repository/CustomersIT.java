@@ -8,13 +8,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import site.lmacedo.kiekishop.ordering.domain.model.model.Customer;
 import site.lmacedo.kiekishop.ordering.domain.model.model.CustomerTestDataBuilder;
+import site.lmacedo.kiekishop.ordering.domain.model.valueobject.Email;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.FullName;
 import site.lmacedo.kiekishop.ordering.domain.model.valueobject.id.CustomerId;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.assembler.CustomerPersistenceEntityAssembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.disassembler.CustomerPersistenceEntityDisassembler;
 import site.lmacedo.kiekishop.ordering.infrasctructure.persistence.provider.CustomersPersistenceProvider;
 
+import java.util.AbstractSet;
 import java.util.Optional;
+import java.util.UUID;
 
 @DataJpaTest
 @Import({
@@ -109,4 +112,29 @@ class CustomersIT {
         Assertions.assertThat(customers.exists(new CustomerId())).isFalse();
     }
 
+    @Test
+    void shouldFindByEmail() {
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
+        customers.add(customer);
+
+        Optional<Customer> customerOptional = customers.ofEmail(customer.email());
+
+        Assertions.assertThat(customerOptional).isPresent();
+    }
+
+    @Test
+    void shouldNotFindByEmailIfNotCustomer() {
+        Optional<Customer> customerOptional = customers.ofEmail(new Email(UUID.randomUUID() + "@gmail.com"));
+        Assertions.assertThat(customerOptional).isNotPresent();
+    }
+
+    @Test
+    void shouldReturnIfEmailIsInUse(){
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
+        customers.add(customer);
+
+        Assertions.assertThat(customers.isEmailUnique(customer.email(), customer.id())).isTrue();
+        Assertions.assertThat(customers.isEmailUnique(customer.email(), new CustomerId())).isFalse();
+        Assertions.assertThat(customers.isEmailUnique(new Email("lucas@gmail.com"), new CustomerId())).isTrue();
+    }
 }
