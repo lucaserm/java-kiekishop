@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import site.lmacedo.kiekishop.ordering.application.order.query.BillingData;
 
 import java.util.UUID;
 

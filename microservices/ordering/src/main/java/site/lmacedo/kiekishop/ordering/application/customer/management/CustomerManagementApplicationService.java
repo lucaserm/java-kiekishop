@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.lmacedo.kiekishop.ordering.application.commons.AddressData;
+import site.lmacedo.kiekishop.ordering.application.customer.query.CustomerOutput;
 import site.lmacedo.kiekishop.ordering.application.utility.Mapper;
 import site.lmacedo.kiekishop.ordering.domain.model.commons.*;
 import site.lmacedo.kiekishop.ordering.domain.model.customer.*;

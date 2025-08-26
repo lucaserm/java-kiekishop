@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import site.lmacedo.kiekishop.ordering.application.commons.AddressData;
+import site.lmacedo.kiekishop.ordering.application.order.query.RecipientData;
 
 @Data
 @AllArgsConstructor

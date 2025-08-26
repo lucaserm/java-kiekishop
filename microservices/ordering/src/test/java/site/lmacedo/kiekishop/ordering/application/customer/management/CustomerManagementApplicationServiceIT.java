@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import site.lmacedo.kiekishop.ordering.application.customer.query.CustomerOutput;
 import site.lmacedo.kiekishop.ordering.domain.model.customer.CustomerArchivedException;
 import site.lmacedo.kiekishop.ordering.domain.model.customer.CustomerNotFoundException;
 

@@ -1,10 +1,9 @@
-package site.lmacedo.kiekishop.ordering.application.customer.management;
+package site.lmacedo.kiekishop.ordering.application.customer.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import site.lmacedo.kiekishop.ordering.application.commons.AddressData;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -14,8 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CustomerOutput {
-
+public class CustomerSummaryOutput {
     private UUID id;
     private String firstName;
     private String lastName;
@@ -28,5 +26,4 @@ public class CustomerOutput {
     private OffsetDateTime archivedAt;
     private Boolean promotionNotificationsAllowed;
     private Boolean archived;
-    private AddressData address;
 }

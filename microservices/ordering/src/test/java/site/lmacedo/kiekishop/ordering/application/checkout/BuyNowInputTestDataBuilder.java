@@ -2,6 +2,8 @@ package site.lmacedo.kiekishop.ordering.application.checkout;
 
 
 import site.lmacedo.kiekishop.ordering.application.commons.AddressData;
+import site.lmacedo.kiekishop.ordering.application.order.query.BillingData;
+import site.lmacedo.kiekishop.ordering.application.order.query.RecipientData;
 import site.lmacedo.kiekishop.ordering.domain.model.customer.CustomerTestDataBuilder;
 import site.lmacedo.kiekishop.ordering.domain.model.product.ProductTestDataBuilder;
 

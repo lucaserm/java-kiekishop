@@ -1,20 +1,17 @@
-package site.lmacedo.kiekishop.ordering.application.checkout;
+package site.lmacedo.kiekishop.ordering.application.order.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import site.lmacedo.kiekishop.ordering.application.commons.AddressData;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BillingData {
+public class RecipientData {
     private String firstName;
     private String lastName;
     private String document;
-    private String email;
     private String phone;
-    private AddressData address;
 }

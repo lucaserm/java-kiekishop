@@ -2,6 +2,7 @@ package site.lmacedo.kiekishop.ordering.application.checkout;
 
 import org.springframework.stereotype.Component;
 import site.lmacedo.kiekishop.ordering.application.commons.AddressData;
+import site.lmacedo.kiekishop.ordering.application.order.query.BillingData;
 import site.lmacedo.kiekishop.ordering.domain.model.commons.*;
 import site.lmacedo.kiekishop.ordering.domain.model.order.Billing;
 
